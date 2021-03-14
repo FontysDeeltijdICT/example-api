@@ -1,0 +1,22 @@
+version: "3.9"
+services:
+  web:
+    build: .
+    depends_on:
+      - mongo
+    ports:
+      - "127.0.0.1:8080:8080"
+  mongo:
+    image: mongo
+    volumes:
+      - mongodb:/data/db
+  mongo-express:
+    image: mongo-express
+    ports:
+      - "127.0.0.1:8081:8081"
+  swagger-editor:
+    image: swaggerapi/swagger-editor
+    ports:
+      - "127.0.0.1:8082:8080"
+volumes:
+  mongodb:

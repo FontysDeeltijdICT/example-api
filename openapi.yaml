@@ -1,0 +1,161 @@
+openapi: 3.0.0
+
+info:
+  title: Bier API
+  version: 1.0.0
+
+servers:
+  - url: https://api.bier.cool/example/v1
+    description: Example API server
+  - url: http://localhost:8080
+    description: Local example API server
+
+paths:
+  /beers:
+    get:
+      summary: Returns a list of beers.
+      tags:
+        - beers
+      responses:
+        '200':
+          description: An array of beers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BeerDatabase'
+    post:
+      summary: Create a new beer.
+      tags:
+        - beers
+      requestBody:
+        $ref: '#/components/requestBodies/Beer'
+      responses:
+        '201':
+          description: Beer created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BeerDatabase'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Error'
+                example:
+                  error: 'Beer validation failed: percentage: Path `percentage` (101) is more than maximum allowed value (100).'
+
+  /beers/{id}:
+    get:
+      summary: Returns a beer by id.
+      tags:
+        - beers
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Information about a beer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BeerDatabase'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+    put:
+      summary: Update a beer by id.
+      tags:
+        - beers
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        $ref: '#/components/requestBodies/Beer'
+      responses:
+        '200':
+          description: Beer updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BeerDatabase'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+    delete:
+      summary: Delete a beer by id.
+      tags:
+        - beers
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Resource deleted successfully
+        '404':
+          $ref: '#/components/responses/404NotFound'
+
+components:
+  parameters:
+    id:
+      name: id
+      in: path
+      required: true
+      description: Beer ID
+      schema:
+        type: string
+
+  requestBodies:
+    Beer:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Beer'
+
+  schemas:
+    Beer:
+      type: object
+      properties:
+        name:
+          type: string
+        percentage:
+          type: number
+      example:
+        name: Leffe Blond
+        percentage: 6.6
+    BeerDatabase:
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        percentage:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        __v:
+          type: string
+      example:
+        _id: '604e71d773b1c96b6238183e'
+        name: Leffe Blond
+        percentage: 6.6
+        createdAt: '2021-03-14T20:28:07.285Z'
+        updatedAt: '2021-03-14T20:28:07.285Z'
+        __v: 0
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+
+  responses:
+    201Created:
+      description: The resource was created successfully
+    404NotFound:
+      description: The resource was not found
+tags:
+  - name: beers
+    description: Hah, beerrr
